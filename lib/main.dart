@@ -1,6 +1,6 @@
-import 'package:bus_trans_jateng/ui/pages/pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:bus_trans_jateng/ui/pages/main_page.dart';
 
 void main() {
   runApp(MyApp());

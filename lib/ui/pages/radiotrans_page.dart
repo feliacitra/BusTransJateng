@@ -1,6 +1,8 @@
-part of 'pages.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class Radio extends StatelessWidget {
+class RadioTrans extends StatelessWidget {
   double getSmallDiameter(BuildContext context) =>
       MediaQuery.of(context).size.width * 2 / 3;
   double getBigDiameter(BuildContext context) =>

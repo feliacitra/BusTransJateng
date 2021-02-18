@@ -1,0 +1,77 @@
+{
+  "project_info": {
+    "project_number": "839741146204",
+    "firebase_url": "https://bustransjateng.firebaseio.com",
+    "project_id": "bustransjateng",
+    "storage_bucket": "bustransjateng.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:839741146204:android:99256b1c97ca373b4ed299",
+        "android_client_info": {
+          "package_name": "com.example.bus_trans_jateng"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "839741146204-78bum30831tgj30kh8p5fjh4vukhe2mm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDe8bTzu9QSVhf81iwPUoMeVd4sBsX0y5Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "839741146204-78bum30831tgj30kh8p5fjh4vukhe2mm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:839741146204:android:d1b07ebab19c22984ed299",
+        "android_client_info": {
+          "package_name": "com.example.bustransjateng"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "839741146204-v48mvtfasf2p68ktl2oobdfl8pob83pd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bustransjateng",
+            "certificate_hash": "eb8fd6d20983bcf30e4a4cb7cf864f69e5719295"
+          }
+        },
+        {
+          "client_id": "839741146204-78bum30831tgj30kh8p5fjh4vukhe2mm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDe8bTzu9QSVhf81iwPUoMeVd4sBsX0y5Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "839741146204-78bum30831tgj30kh8p5fjh4vukhe2mm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

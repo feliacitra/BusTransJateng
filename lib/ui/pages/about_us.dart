@@ -1,4 +1,6 @@
-part of 'pages.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:supercharged/supercharged.dart';
 
 class About extends StatefulWidget {
   @override
@@ -8,24 +10,13 @@ class About extends StatefulWidget {
 class _AboutState extends State<About> {
   @override
   Widget build(BuildContext context) {
-    return GeneralPage(
-      //tampilan awal keseluruhan
-      title: 'Developer',
-      backColor: "white".toColor(),
-      onBackButtonPressed: () {
-        Get.back();
-      },
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Tentang Developer', style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFFff0000),
+      ),
+      body: Column(
         children: [
-          Center(
-            child: Text(
-              'Tentang Developer',
-              style: GoogleFonts.dmSans(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
           Center(
             child: Container(
               height: 200,

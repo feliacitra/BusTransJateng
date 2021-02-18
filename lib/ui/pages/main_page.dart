@@ -1,4 +1,13 @@
-part of 'pages.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:supercharged/supercharged.dart';
+import 'package:bus_trans_jateng/ui/pages/busterdekat_page.dart';
+import 'package:bus_trans_jateng/ui/pages/halteterdekat_page.dart';
+import 'package:bus_trans_jateng/ui/pages/literasi_page.dart';
+import 'package:bus_trans_jateng/ui/pages/about_us.dart';
+import 'package:bus_trans_jateng/ui/pages/eduwisata_page.dart';
+import 'package:bus_trans_jateng/ui/pages/rute_page.dart';
+import 'package:bus_trans_jateng/ui/pages/radiotrans_page.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -52,7 +61,10 @@ class _MainPageState extends State<MainPage> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        // Get.to(NearBus());
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BusTerdekat()));
                       },
                       child: Container(
                         //container bus terdekat
@@ -101,49 +113,57 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ),
                     ),
-                    Container(
-                      //container halte terdekat
-                      height: 110,
-                      width: 110,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: <BoxShadow>[
-                            BoxShadow(
-                                color: "585464".toColor().withOpacity(0.07),
-                                blurRadius: 16,
-                                offset: Offset(0.0, 4.0))
-                          ]),
-                      child: Column(
-                        //kolom diisi icon dan tulisan
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            height: 40,
-                            width: 40,
-                            margin: EdgeInsets.only(bottom: 5),
-                            decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: AssetImage('assets/halte-red.png'))),
-                          ),
-                          Text(
-                            'Halte',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
+                    GestureDetector(
+                      //Halte Tedekat
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Halte()));
+                      },
+                      child: Container(
+                        //container halte terdekat
+                        height: 110,
+                        width: 110,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: <BoxShadow>[
+                              BoxShadow(
+                                  color: "585464".toColor().withOpacity(0.07),
+                                  blurRadius: 16,
+                                  offset: Offset(0.0, 4.0))
+                            ]),
+                        child: Column(
+                          //kolom diisi icon dan tulisan
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 40,
+                              width: 40,
+                              margin: EdgeInsets.only(bottom: 5),
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image:
+                                          AssetImage('assets/halte-red.png'))),
                             ),
-                          ),
-                          Text(
-                            'Terdekat',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
+                            Text(
+                              'Halte',
+                              style: GoogleFonts.dmSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.normal,
+                              ),
                             ),
-                          )
-                        ],
+                            Text(
+                              'Terdekat',
+                              style: GoogleFonts.dmSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            )
+                          ],
+                        ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -154,46 +174,55 @@ class _MainPageState extends State<MainPage> {
                   //untuk menu baris 2
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      //container rute bus
-                      height: 110,
-                      width: 110,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: <BoxShadow>[
-                            BoxShadow(
-                                color: "565464".toColor().withOpacity(0.07),
-                                blurRadius: 16,
-                                offset: Offset(0.0, 4.0))
-                          ]),
-                      child: Column(
-                        //kolom diisi icon dan tulisan
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            height: 40,
-                            width: 40,
-                            margin:
-                                EdgeInsets.only(bottom: 5), //jarak dg tulisan
-                            decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: AssetImage('assets/rute-red.png'))),
-                          ),
-                          Text(
-                            'Rute Bus',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Rute()));
+                      },
+                      child: Container(
+                        height: 110,
+                        width: 110,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: <BoxShadow>[
+                              BoxShadow(
+                                  color: "565464".toColor().withOpacity(0.07),
+                                  blurRadius: 16,
+                                  offset: Offset(0.0, 4.0))
+                            ]),
+                        child: Column(
+                          //kolom diisi icon dan tulisan
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 40,
+                              width: 40,
+                              margin:
+                                  EdgeInsets.only(bottom: 5), //jarak dg tulisan
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image:
+                                          AssetImage('assets/rute-red.png'))),
                             ),
-                          )
-                        ],
+                            Text(
+                              'Rute Bus',
+                              style: GoogleFonts.dmSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                     GestureDetector(
                       onTap: () {
-                        Get.to(Eduwisata());
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Eduwisata()));
                       },
                       child: Container(
                         //container eduwisata trans jateng
@@ -251,7 +280,10 @@ class _MainPageState extends State<MainPage> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Get.to(Literasi());
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Literasi()));
                       },
                       child: Container(
                         //container Pogram Liteasi
@@ -302,7 +334,10 @@ class _MainPageState extends State<MainPage> {
                     GestureDetector(
                       //radio trans jateng
                       onTap: () {
-                        Get.to(Radio());
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RadioTrans()));
                       },
                       child: Container(
                         //container Radio Trans Jateng
@@ -360,7 +395,8 @@ class _MainPageState extends State<MainPage> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Get.to(About());
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => About()));
                       },
                       child: Container(
                         //container Developer
