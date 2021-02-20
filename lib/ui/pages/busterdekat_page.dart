@@ -19,36 +19,23 @@ class _BusTerdekatState extends State<BusTerdekat> {
   var busD = "";
   GoogleMapController mapController;
   List<Marker> allMarkers = [];
+  Iterable marker = [];
+  Set<Marker> getMarkerFromDb = Set();
   void readData() {
     databaseDeviceA.onValue.listen((Event event) {
       busA = event.snapshot.value['Latitude'];
       busB = event.snapshot.value['Longitude'];
       print('Data : ${event.snapshot.value['Latitude']}');
       print('Data : ${event.snapshot.value['Longitude']}');
-      // mapController.animateCamera(CameraUpdate.newCameraPosition(
-      //   CameraPosition(
-      //       target: LatLng(event.snapshot.value['Latitude'],
-      //           event.snapshot.value['Longitude']),
-      //       zoom: 17),
-      // ));
-      // allMarkers.add(Marker(
-      //     markerId: MarkerId('1'),
-      //     position: LatLng(event.snapshot.value['Latitude'],
-      //         event.snapshot.value['Longitude'])));
-    });
-  }
-
-  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
-  void initMarker(specify, specifyId) async {
-    var MarkerIdVal = specifyId;
-    final MarkerId markerId = MarkerId(MarkerIdVal);
-    final Marker marker = Marker(
-        markerId: markerId,
-        position: LatLng(
-            specify['Latitude'].latitude, specify['Longitude'].longitude),
-        infoWindow: InfoWindow(title: 'DeviceA'));
-    setState(() {
-      markers[markerId] = marker;
+      Marker resultMarker = Marker(
+          markerId: MarkerId(event.snapshot.value['MarkerId']),
+          position: LatLng(double.parse(event.snapshot.value['Latitude']),
+              double.parse(event.snapshot.value['Longitude'])),
+          infoWindow: InfoWindow(title: event.snapshot.value['MarkerId']));
+      setState(() {
+        getMarkerFromDb.remove(resultMarker);
+        getMarkerFromDb.add(resultMarker);
+      });
     });
   }
 
@@ -64,6 +51,16 @@ class _BusTerdekatState extends State<BusTerdekat> {
       busD = event.snapshot.value['Longitude'];
       print('Data : ${event.snapshot.value['Latitude']}');
       print('Data : ${event.snapshot.value['Longitude']}');
+      print('Data ${event.snapshot.value}');
+      Marker resultMarker = Marker(
+          markerId: MarkerId(event.snapshot.value['MarkerId']),
+          position: LatLng(double.parse(event.snapshot.value['Latitude']),
+              double.parse(event.snapshot.value['Longitude'])),
+          infoWindow: InfoWindow(title: event.snapshot.value['MarkerId']));
+      setState(() {
+        getMarkerFromDb.remove(resultMarker);
+        getMarkerFromDb.add(resultMarker);
+      });
     });
   }
 
@@ -72,19 +69,10 @@ class _BusTerdekatState extends State<BusTerdekat> {
     readDataB();
     super.initState();
   }
-  // void initState() {
-  //   super.initState();
-  //   allMarkers.add(
-  //     Marker(
-  //       markerId: MarkerId('busA'),
-  //       draggable: false,
-  //       position: LatLng(busA.latitude, busB.longitude),
-  //     ),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
+    print('mymarker $getMarkerFromDb');
     return Scaffold(
       appBar: AppBar(
         title: Text('Bus Terdekat', style: TextStyle(color: Colors.white)),
@@ -96,7 +84,7 @@ class _BusTerdekatState extends State<BusTerdekat> {
             mapType: MapType.normal,
             initialCameraPosition:
                 CameraPosition(target: LatLng(-7.431326, 109.248592), zoom: 15),
-            markers: Set.from(allMarkers),
+            markers: getMarkerFromDb,
             onMapCreated: _onMapCreated,
           ),
           Container(
@@ -140,19 +128,6 @@ class _BusTerdekatState extends State<BusTerdekat> {
                   )
                 ],
               )),
-          // RaisedButton(
-          //   child: Text('Tampil Data'),
-          //   color: Colors.redAccent,
-          //   onPressed: () {
-          //     readData();
-          //     readDataB();
-          //   },
-          //   shape: RoundedRectangleBorder(
-          //       borderRadius: BorderRadius.all(Radius.circular(20))),
-          // ),
-          // SizedBox(
-          //   height: 8,
-          // ),
         ],
       ),
     );
