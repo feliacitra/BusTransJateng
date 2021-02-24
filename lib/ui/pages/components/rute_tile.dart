@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:bus_trans_jateng/ui/models/rute_bus.dart';
+import 'package:bus_trans_jateng/ui/pages/components/rute_detail.dart';
 
 class RuteTile extends StatelessWidget {
   final RuteBus ruteBus;
@@ -18,25 +19,24 @@ class RuteTile extends StatelessWidget {
             padding: EdgeInsets.only(right: 12.0),
             decoration: new BoxDecoration(
                 border: new Border(
-                    right: new BorderSide(width: 2.0, color: Colors.amber))),
+                    right: new BorderSide(width: 2.0, color: Colors.blue))),
             child: FaIcon(
               FontAwesomeIcons.route,
-              color: Colors.blue,
+              color: Colors.red,
               size: 30,
             ),
           ),
           title: Text(
             ruteBus.name,
-            style:
-                TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
           trailing: Icon(Icons.keyboard_arrow_right,
               color: Colors.black45, size: 40.0),
           onTap: () {
-            // Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //         builder: (context) => RuteDetail(ruteBus: ruteBus)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => RuteDetail(ruteBus: ruteBus)));
           },
         ),
       ),

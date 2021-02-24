@@ -8,7 +8,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bus_trans_jateng/ui/global/curve_painter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-// import 'package:get/get.dart';
 
 class RuteDetail extends StatefulWidget {
   final RuteBus ruteBus;
@@ -18,23 +17,21 @@ class RuteDetail extends StatefulWidget {
 }
 
 class _RuteDetailState extends State<RuteDetail> {
-  // List<RuteHalteBus> ruteHalteBusList = [];
-
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController mapController;
   LatLng _lastMapPosition = _center;
-  BitmapDescriptor iconHalte;
   Position _currentPosition;
-  static const LatLng _center = const LatLng(-7.431326, 109.248592);
+  static const LatLng _center = const LatLng(-7.437726, 109.330851);
   final Set<Marker> _markers = {};
   List<LatLng> points = [];
 
-  // for my drawn routes on the map
+  // polyline halte
   Set<Polyline> _polylines = Set<Polyline>();
   List<LatLng> polylineCoordinates = [];
   PolylinePoints polylinePoints;
   final _API = "AIzaSyB5DAWFw7QfviInDgsmiNSblskzqkUVSGk";
 
+//dapatkan data dari firestore
   Future getDocs() async {
     List<RuteHalteBus> listRuteHalteBus = new List<RuteHalteBus>();
 
@@ -57,7 +54,10 @@ class _RuteDetailState extends State<RuteDetail> {
     setState(() => ruteHalteBusList = listRuteHalteBus);
   }
 
+//inisialisasi rutehalte terbaru
   List<RuteHalteBus> ruteHalteBusList = [];
+
+//pada map tambahkan polyline dan marker
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     _controller.complete(controller);
@@ -73,24 +73,25 @@ class _RuteDetailState extends State<RuteDetail> {
           addMarker(latLng, 'halte${ruteHalteBusList[i].key}',
               ruteHalteBusList[i].name, ruteHalteBusList[i]);
         });
-        // LatLng sw = southwestFromLatLngList(points);
-        // LatLng ne = northeastFromLatLngList(points);
-        // LatLng mid =
-        //     MidPoint(sw.latitude, sw.longitude, ne.latitude, ne.longitude);
-        // print('mid : ${mid.latitude} - ${mid.longitude}');
-        // print('mid : ${mid.latitude} - ${mid.longitude}');
-        // mapController.animateCamera(CameraUpdate.newCameraPosition(
-        //     CameraPosition(target: mid, zoom: 12.00)));
-        // setPolylines(
-        //     ruteHalteBusList[i].latitude,
-        //     ruteHalteBusList[i].longitude,
-        //     ruteHalteBusList[i + 1].latitude,
-        //     ruteHalteBusList[i + 1].longitude,
-        //     '$i');
+        LatLng sw = southwestFromLatLngList(points);
+        LatLng ne = northeastFromLatLngList(points);
+        LatLng mid =
+            MidPoint(sw.latitude, sw.longitude, ne.latitude, ne.longitude);
+        print('mid : ${mid.latitude} - ${mid.longitude}');
+        print('mid : ${mid.latitude} - ${mid.longitude}');
+        mapController.animateCamera(CameraUpdate.newCameraPosition(
+            CameraPosition(target: mid, zoom: 12.00)));
+        setPolylines(
+            ruteHalteBusList[i].latitude,
+            ruteHalteBusList[i].longitude,
+            ruteHalteBusList[i + 1].latitude,
+            ruteHalteBusList[i + 1].longitude,
+            '$i');
       }
     }
   }
 
+//fungsi penambahan marker
   void addMarker(LatLng mLatLng, String mTitle, String mDescription,
       RuteHalteBus ruteHalteBus) {
     _markers.add(Marker(
@@ -112,83 +113,40 @@ class _RuteDetailState extends State<RuteDetail> {
     _lastMapPosition = position.target;
   }
 
-  // void setPolylines(
-  //     String lat1, String lon1, String lat2, String lon2, String id) async {
-  //   List<PointLatLng> result = await polylinePoints.getRouteBetweenCoordinates(
-  //       _API,
-  //       double.parse(lat1),
-  //       double.parse(lon1),
-  //       double.parse(lat2),
-  //       double.parse(lon2));
-  //   if (result.isNotEmpty) {
-  //     polylineCoordinates = [];
-  //     result.forEach((PointLatLng point) {
-  //       polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-  //     });
-  //     setState(() {
-  //       _polylines.add(Polyline(
-  //           width: 5, // set the width of the polylines
-  //           polylineId: PolylineId('poly_$id'),
-  //           color: getColor(getRute(widget.ruteBus.name)),
-  //           points: polylineCoordinates));
-  //     });
-  //   }
-  // }
-
-  // _getCurrentLocation() {
-  //   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-  //   geolocator
-  //       .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-  //       .then((Position position) {
-  //     setState(() {
-  //       _currentPosition = position;
-  //       mapController.animateCamera(CameraUpdate.newCameraPosition(
-  //           CameraPosition(
-  //               target: LatLng(position.latitude, position.longitude),
-  //               zoom: 16.00)));
-  //       // createCurrentMarker(position);
-  //       print(position);
-  //     });
-  //   }).catchError((e) {
-  //     print(e);
-  //   });
-  // }
+  void setPolylines(
+      String lat1, String lon1, String lat2, String lon2, String id) async {
+    List<PointLatLng> result = await polylinePoints.getRouteBetweenCoordinates(
+        _API,
+        double.parse(lat1),
+        double.parse(lon1),
+        double.parse(lat2),
+        double.parse(lon2));
+    if (result.isNotEmpty) {
+      polylineCoordinates = [];
+      result.forEach((PointLatLng point) {
+        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      });
+      setState(() {
+        _polylines.add(Polyline(
+            width: 5, // set the width of the polylines
+            polylineId: PolylineId('poly_$id'),
+            color: Colors.blue,
+            points: polylineCoordinates));
+      });
+    }
+  }
 
   @override
   void initState() {
-    // TODO: implement initState
     getDocs();
-
-    BitmapDescriptor.fromAssetImage(
-            ImageConfiguration(devicePixelRatio: 2.5), 'assets/halteMark1.png')
-        .then((d) {
-      iconHalte = d;
-    });
 
     polylinePoints = PolylinePoints();
 
     super.initState();
   }
 
-  // void CreateListofHalte(QuerySnapshot snapshot) async {
-  //   var docs = snapshot.documents;
-  //   ruteHalteBusList = [];
-  //   for (var Doc in docs) {
-  //     await ruteHalteBusList.add(RuteHalteBus.fromFireStore(Doc));
-  //   }
-  // }
-
-  // void MasterList() async {
-  //   await Firestore.instance
-  //       .collection("rute_bus")
-  //       .document(widget.ruteBus.key.toString())
-  //       .collection('halte_bus')
-  //       .orderBy('key')
-  //       .snapshots()
-  //       .listen(await CreateListofHalte);
-  // }
-
   Widget build(BuildContext context) {
+    //list halte
     ListTile makeListTile(RuteHalteBus ruteHalteBus) => ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
           title: Text(
@@ -197,8 +155,8 @@ class _RuteDetailState extends State<RuteDetail> {
               color: Colors.black54,
             ),
           ),
-          trailing: Icon(Icons.keyboard_arrow_right,
-              color: Colors.black26, size: 30.0),
+          // trailing: Icon(Icons.keyboard_arrow_right,
+          //     color: Colors.black26, size: 30.0),
         );
     Card makeCard(RuteHalteBus ruteHalteBus) => Card(
           elevation: 0.0,
@@ -216,7 +174,6 @@ class _RuteDetailState extends State<RuteDetail> {
           GoogleMap(
             mapType: MapType.normal,
             markers: Set.of((_markers != null) ? _markers : []),
-            // circles: Set.of((_circle != null) ? [_circle] : []),
             polylines: Set.of((_polylines != null) ? _polylines : []),
             initialCameraPosition: CameraPosition(
               target: _center,
@@ -225,6 +182,7 @@ class _RuteDetailState extends State<RuteDetail> {
             onMapCreated: _onMapCreated,
             onCameraMove: _onCameraMove,
           ),
+          //button back di pojok
           Positioned(
             left: 8.0,
             top: 35.0,
@@ -251,22 +209,6 @@ class _RuteDetailState extends State<RuteDetail> {
                 height: MediaQuery.of(context).size.height * 0.8,
                 child: Column(
                   children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        FloatingActionButton(
-                            child: Icon(Icons.location_searching),
-                            onPressed: () {
-                              // _getCurrentLocation();
-                            }),
-                        SizedBox(
-                          width: 10,
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
@@ -309,32 +251,30 @@ class _RuteDetailState extends State<RuteDetail> {
                                     decoration: new BoxDecoration(
                                         border: new Border(
                                             right: new BorderSide(
-                                                width: 3.0,
-                                                color: getColor(getRute(
-                                                    widget.ruteBus.name))))),
+                                                width:
+                                                    3.0, //untuk garis setelah icon rute
+                                                color: Colors.blue))),
                                     child: FaIcon(
+                                      //untuk icon rute
                                       FontAwesomeIcons.route,
-                                      color: getColor(
-                                          getRute(widget.ruteBus.name)),
+                                      color: Colors.red,
                                       size: 40,
                                     ),
                                   ),
                                   title: Text(
+                                    //untuk nama rute
                                     widget.ruteBus.name,
                                     style: TextStyle(
                                         color: Colors.black54,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 24),
                                   ),
-                                  // subtitle: Text(
-                                  //     _infoBus??"Real-time departure not avaible",
-                                  //     style: TextStyle(color: Colors.black54, fontSize: 18)),
                                 ),
                               ),
                               Card(
                                 child: ListTile(
                                   title: Text(
-                                    'ALL STOPS',
+                                    'ALL HALTE',
                                     style: TextStyle(
                                         color: Colors.black38,
                                         fontWeight: FontWeight.bold,
@@ -342,6 +282,7 @@ class _RuteDetailState extends State<RuteDetail> {
                                   ),
                                 ),
                               ),
+                              //list halte
                               Container(
                                 child: ListView.builder(
                                   physics: NeverScrollableScrollPhysics(),
@@ -354,8 +295,7 @@ class _RuteDetailState extends State<RuteDetail> {
                                         Container(
                                           child: CustomPaint(
                                             painter: CurvePainter(
-                                                color: getColor(getRute(
-                                                    widget.ruteBus.name))),
+                                                color: Colors.amber),
                                           ),
                                           color: Colors.white,
                                           width: 60,

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supercharged/supercharged.dart';
-import 'package:bus_trans_jateng/ui/pages/busterdekat_page.dart';
+// import 'package:location/location.dart';
+import 'package:bus_trans_jateng/ui/pages/bus_terdekat.dart';
 import 'package:bus_trans_jateng/ui/pages/halteterdekat_page.dart';
 import 'package:bus_trans_jateng/ui/pages/literasi_page.dart';
 import 'package:bus_trans_jateng/ui/pages/about_us.dart';
@@ -15,6 +16,24 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  // final Location location = Location();
+
+  // PermissionStatus _permissionGranted;
+  // Future<void> _requestPermission() async {
+  //   if (_permissionGranted != PermissionStatus.granted) {
+  //     final PermissionStatus permissionRequestedResult =
+  //         await location.requestPermission();
+  //     setState(() {
+  //       _permissionGranted = permissionRequestedResult;
+  //     });
+  //   }
+  // }
+
+  // void initSate() {
+  //   _requestPermission();
+  //   super.initState();
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,10 +80,8 @@ class _MainPageState extends State<MainPage> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => BusTerdekat()));
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Bus()));
                       },
                       child: Container(
                         //container bus terdekat
@@ -447,3 +464,7 @@ class _MainPageState extends State<MainPage> {
     ));
   }
 }
+
+// showdialog(){
+
+// }

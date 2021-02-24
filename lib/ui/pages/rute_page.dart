@@ -12,16 +12,14 @@ class Rute extends StatefulWidget {
 class _RuteState extends State<Rute> {
   @override
   Widget build(BuildContext context) {
-    // return Scaffold(
-    //   appBar: AppBar(
-    //     title: Text('Rute Bus', style: TextStyle(color: Colors.white)),
-    //     backgroundColor: Color(0xFFff0000),
-    //   ),
-    // );
     return StreamProvider<List<RuteBus>>.value(
       value: DatabaseService().rutebuses,
       child: Scaffold(
         body: RuteList(),
+        appBar: AppBar(
+          title: Text('Rute Bus', style: TextStyle(color: Colors.white)),
+          backgroundColor: Color(0xFFff0000),
+        ),
       ),
     );
   }

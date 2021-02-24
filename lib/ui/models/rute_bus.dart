@@ -1,4 +1,4 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RuteBus {
   String key;
@@ -20,21 +20,28 @@ class RuteHalteBus {
   String longitude;
   String type;
   String rute;
-  String pwt;
-  String pbg;
-  RuteHalteBus(
-      {this.key,
-      this.name,
-      this.latitude,
-      this.longitude,
-      this.type,
-      this.rute,
-      this.pwt,
-      this.pbg});
+
+  RuteHalteBus({
+    this.key,
+    this.name,
+    this.latitude,
+    this.longitude,
+    this.type,
+    this.rute,
+  });
 
   bool operator ==(o) => o is RuteHalteBus && o.name == name;
   int get hashCode => name.hashCode;
-
+  factory RuteHalteBus.fromFireStore(DocumentSnapshot doc) {
+    Map data = doc.data;
+    return RuteHalteBus(
+      key: doc.documentID,
+      name: data['name'],
+      latitude: data['latitude'],
+      longitude: data['longitude'],
+      type: data['type'],
+    );
+  }
   @override
   toString() => 'Name: $name';
 }

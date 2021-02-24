@@ -277,6 +277,7 @@ class _EduwisataState extends State<Eduwisata> {
   }
 }
 
+//popup
 showDialogFunc(context, img, title, desc) {
   return showDialog(
       context: context,

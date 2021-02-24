@@ -1,10 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-// import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:bus_trans_jateng/ui/pages/halte_list.dart';
-import 'package:location/location.dart';
-// import 'package:permission_handler/permission_handler.dart';
+
+import 'package:dio/dio.dart';
+import 'package:bus_trans_jateng/ui/global/custom_info_widget.dart';
+import 'package:bus_trans_jateng/ui/models/distance.dart';
+// import 'package:bus_trans_jateng/ui/global/global_function.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:bus_trans_jateng/ui/models/halte_bus.dart';
 
 class Halte extends StatefulWidget {
   @override
@@ -14,271 +20,329 @@ class Halte extends StatefulWidget {
 class _HalteState extends State<Halte> {
   GoogleMapController _controller;
 
-  List<Marker> allMarkers = [];
-  PageController _pageController;
-  Location _location = Location();
+  Position _currentPosition;
+  final Set<Marker> _markers = {};
+  BitmapDescriptor iconMe;
 
-  int prevPage;
+  InfoWidgetRoute _infoWidgetRoute;
+  StreamSubscription _mapIdleSubscription;
+  LatLng _initialLocation = LatLng(-7.437726, 109.330851);
+  Circle _circle;
+  BitmapDescriptor iconHalte;
+  var _API = 'AIzaSyB5DAWFw7QfviInDgsmiNSblskzqkUVSGk';
+  Dio dio = new Dio();
+  DistanceMatrix _distanceMatrix;
+  List<PointObject> _points = [];
+  var _jarak;
 
-  @override
-  void initState() {
-    super.initState();
-    daftarhalte.forEach((element) {
-      allMarkers.add(Marker(
-          markerId: MarkerId(element.halteName),
-          draggable: false,
-          infoWindow: InfoWindow(
-              title: element.halteName, snippet: element.description),
-          position: element.locationCoords));
+  _getCurrentLocation() {
+    final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+    geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
+      setState(() {
+        _currentPosition = position;
+        _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 16.00)));
+        createCurrentMarker(position);
+        print(position);
+      });
+    }).catchError((e) {
+      print(e);
     });
-    _pageController = PageController(initialPage: 1, viewportFraction: 0.8)
-      ..addListener(_onScroll);
   }
 
-  void _onScroll() {
-    if (_pageController.page.toInt() != prevPage) {
-      prevPage = _pageController.page.toInt();
+  /// This method sets selectedLocation to current location.
+  void setCurrentLocation() async {
+    if (_controller != null) {
+      setState(() {
+        createCurrentMarker(_currentPosition);
+      });
+      await _controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(
+              _currentPosition.latitude - 0.0001,
+              _currentPosition.longitude,
+            ),
+            zoom: 16,
+          ),
+        ),
+      );
+      await _controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(
+              _currentPosition.latitude,
+              _currentPosition.longitude,
+            ),
+            zoom: 16,
+          ),
+        ),
+      );
     }
   }
 
-  _daftarHalteList(index) {
-    return AnimatedBuilder(
-      animation: _pageController,
-      builder: (BuildContext context, Widget widget) {
-        double value = 1;
-        if (_pageController.position.haveDimensions) {
-          value = _pageController.page - index;
-          value = (1 - (value.abs() * 0.3) + 0.06).clamp(0.0, 1.0);
-        }
-        return Center(
-          child: SizedBox(
-            height: Curves.easeInOut.transform(value) * 125.0,
-            width: Curves.easeInOut.transform(value) * 350.0,
-            child: widget,
-          ),
-        );
-      },
-      //jika salah satu halte di pilih
-      child: InkWell(
-          onTap: () {
-            moveCamera();
-          },
-          child: Stack(children: [
-            Center(
-              child: Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: 10.0,
-                  vertical: 20.0,
-                ),
-                height: 125.0,
-                width: 275.0,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.0),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black54,
-                          offset: Offset(0.0, 4.0),
-                          blurRadius: 10.0),
-                    ]),
-                child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.0),
-                      color: Colors.white,
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                            height: 90.0,
-                            width: 90.0,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(10.0),
-                                  topLeft: Radius.circular(10.0),
-                                ),
-                                image: DecorationImage(
-                                    image: AssetImage('assets/halte2.png'),
-                                    fit: BoxFit.cover))),
-                        SizedBox(width: 5.0),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              daftarhalte[index].halteName,
-                              style: TextStyle(
-                                  fontSize: 12.5, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              daftarhalte[index].description,
-                              style: TextStyle(
-                                  fontSize: 12.5, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        )
-                      ],
-                    )),
-              ),
-            )
-          ])),
-    );
-  }
-
-  ///user current location
-  void mapCreaterd(controller) {
-    setState(() {
-      _controller = controller;
-      _location.onLocationChanged.listen((event) {
-        _controller.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: LatLng(event.latitude, event.longitude),
-              zoom: 15,
-            ),
-          ),
-        );
-      });
+  void createCurrentMarker(Position pos) {
+    this.setState(() {
+      _markers.add(Marker(
+        markerId: MarkerId('Me'),
+        icon: iconMe,
+        infoWindow: InfoWindow(
+          title: 'Me',
+        ),
+        position: LatLng(pos.latitude, pos.longitude),
+      ));
     });
   }
 
+  void _onMapCreated(GoogleMapController controller) {
+    setState(() {
+      _controller = controller;
+    });
+  }
+
+  // _onCalculateDistance(lat1, long1, lat2, long2) async {
+  //   try {
+  //     Response response = await dio.get(
+  //         "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=$lat1,$long1&destinations=$lat2,$long2&key=$_API");
+  //     _distanceMatrix = new DistanceMatrix.fromJson(response.data);
+  //     print('Jarak : ' +
+  //         (_distanceMatrix.elements[0].distance.value / 1000)
+  //             .toStringAsFixed(1) +
+  //         ' km');
+  //     setState(() {
+  //       _jarak = (_distanceMatrix.elements[0].distance.value / 1000)
+  //           .toStringAsFixed(1);
+  //     });
+  //     Scaffold.of(context).showSnackBar(SnackBar(
+  //       backgroundColor: Theme.of(context).primaryColorDark,
+  //       content: Text('Jarak dari posisi sekarang : $_jarak km'),
+  //     ));
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    Future.delayed(Duration.zero, () {
+      Scaffold.of(context).removeCurrentSnackBar();
+    });
+
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    BitmapDescriptor.fromAssetImage(
+            ImageConfiguration(devicePixelRatio: 2), 'assets/meMark.png')
+        .then((d) {
+      iconMe = d;
+    });
+    // print(_getLastKnownLat());
+    // print(_getLastKnownLong());
+    super.initState();
+  }
+
+  // _getLastKnownLat() async {
+  //   Position _position = await Geolocator()
+  //       .getLastKnownPosition(desiredAccuracy: LocationAccuracy.high);
+  //   return _position.latitude.toString();
+  // }
+
+  // _getLastKnownLong() async {
+  //   Position _position = await Geolocator()
+  //       .getLastKnownPosition(desiredAccuracy: LocationAccuracy.high);
+  //   return _position.longitude.toString();
+  // }
+
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Halte Terdekat", style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFFff0000),
-      ),
-      body: Stack(
-        children: <Widget>[
-          Container(
-            child: GoogleMap(
+    return StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance.collection("halte_bus").snapshots(),
+      builder: (context, snapshot) {
+        for (int i = 0; i < snapshot.data.documents.length; i++) {
+          DocumentSnapshot snap = snapshot.data.documents[i];
+          // var _text = snap.data['rute'].split(',');
+          _points.add(PointObject(
+            location: LatLng(double.parse(snap.data['latitude']),
+                double.parse(snap.data['longitude'])),
+            // child: Card(
+            //   child: ListTile(
+            //     contentPadding:
+            //         EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+            //     title: Text(
+            //       snap.data['name'],
+            //       style: TextStyle(fontSize: 16),
+            //     ),
+            //     // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
+
+            //     subtitle: Column(
+            //       crossAxisAlignment: CrossAxisAlignment.start,
+            //       children: <Widget>[
+            //         Text(getType(snap.data['type']),
+            //             style: TextStyle(fontSize: 14)),
+
+            //         Container(
+            //           height: 28,
+            //           child: Row(
+            //             mainAxisAlignment: MainAxisAlignment.start,
+            //             children: <Widget>[
+            //               Expanded(
+            //                 child: new ListView.builder(
+            //                   scrollDirection: Axis.horizontal,
+            //                   shrinkWrap: true,
+            //                   itemCount: _text.length,
+            //                   itemBuilder: (context, index) {
+            //                     return Padding(
+            //                       padding:
+            //                           const EdgeInsets.fromLTRB(0, 3, 4, 5),
+            //                       child: Container(
+            //                         padding: const EdgeInsets.symmetric(
+            //                             vertical: 1, horizontal: 1),
+            //                         decoration: new BoxDecoration(
+            //                             border: new Border.all(
+            //                                 color:
+            //                                     getColor(_text[index].trim())),
+            //                             borderRadius:
+            //                                 BorderRadius.circular(5.0)),
+            //                         child: new Text(
+            //                           _text[index].trim(),
+            //                           style: TextStyle(
+            //                               color: getColor(_text[index].trim()),
+            //                               fontSize: 14),
+            //                           textAlign: TextAlign.center,
+            //                         ),
+            //                       ),
+            //                     );
+            //                   },
+            //                 ),
+            //               )
+            //               // Text( _text[0], style: TextStyle(color: Colors.black54)),
+            //             ],
+            //           ),
+            //         ),
+            //         //Text( halteBus.rute, style: TextStyle(color: Colors.black54)),
+            //       ],
+            //     ),
+            //   ),
+            // ),
+          ));
+          _markers.add(Marker(
+            markerId: MarkerId(snap.documentID),
+            icon: iconHalte,
+            position: LatLng(double.parse(snap.data['latitude']),
+                double.parse(snap.data['longitude'])),
+            // onTap: () => _onTap(_points[i]),
+          ));
+        }
+        return GestureDetector(
+          onTap: () {
+            Scaffold.of(context).removeCurrentSnackBar();
+          },
+          child: Scaffold(
+            body: GoogleMap(
               mapType: MapType.normal,
+              markers: Set.of((_markers != null) ? _markers : []),
+              // circles: Set.of((_circle != null) ? [_circle] : []),
               initialCameraPosition: CameraPosition(
-                target: LatLng(-7.431326, 109.248592),
-                zoom: 12,
+                target: _initialLocation,
+                zoom: 11,
               ),
-              markers: Set.from(allMarkers),
-              onMapCreated: mapCreaterd,
-              myLocationEnabled: true,
+              onMapCreated: (GoogleMapController controller) {
+                _controller = controller;
+              },
+              onTap: (LatLng coord) {
+                Scaffold.of(context).removeCurrentSnackBar();
+              },
+              onCameraMove: (newPosition) {
+                _mapIdleSubscription?.cancel();
+                _mapIdleSubscription =
+                    Future.delayed(Duration(milliseconds: 150))
+                        .asStream()
+                        .listen((_) {
+                  if (_infoWidgetRoute != null) {
+                    Navigator.of(context, rootNavigator: true)
+                        .push(_infoWidgetRoute)
+                        .then<void>(
+                      (newValue) {
+                        _infoWidgetRoute = null;
+                      },
+                    );
+                  }
+                });
+              },
             ),
+            floatingActionButton: FloatingActionButton(
+                child: Icon(Icons.location_searching),
+                onPressed: () {
+                  _getCurrentLocation();
+                }),
           ),
-          Positioned(
-            bottom: 20.0,
-            child: Container(
-              height: 200.0,
-              width: MediaQuery.of(context).size.width,
-              child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: daftarhalte.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return _daftarHalteList(index);
-                  }),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  moveCamera() {
-    _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-      target: daftarhalte[_pageController.page.toInt()].locationCoords,
-      zoom: 18.0,
-      bearing: 45.0,
-      tilt: 45.0,
-    )));
-  }
+  // _onTap(PointObject point) async {
+  //   final RenderBox renderBox = context.findRenderObject();
+  //   Rect _itemRect = renderBox.localToGlobal(Offset.zero) & renderBox.size;
+
+  //   if (_currentPosition == null) {
+  //     final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+  //     geolocator
+  //         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+  //         .then((Position position) {
+  //       if (position != null) {
+  //         setState(() {
+  //           _currentPosition = position;
+  //         });
+  //       }
+  //     }).catchError((e) {
+  //       print(e);
+  //     });
+  //   }
+
+  //   _infoWidgetRoute = InfoWidgetRoute(
+  //     child: point.child,
+  //     buildContext: context,
+  //     mapsWidgetSize: _itemRect,
+  //   );
+
+  //   await _controller.animateCamera(
+  //     CameraUpdate.newCameraPosition(
+  //       CameraPosition(
+  //         target: LatLng(
+  //           point.location.latitude - 0.0001,
+  //           point.location.longitude,
+  //         ),
+  //         zoom: 16,
+  //       ),
+  //     ),
+  //   );
+
+  //   await _controller.animateCamera(
+  //     CameraUpdate.newCameraPosition(
+  //       CameraPosition(
+  //         target: LatLng(
+  //           point.location.latitude,
+  //           point.location.longitude,
+  //         ),
+  //         zoom: 16,
+  //       ),
+  //     ),
+  //   );
+
+  //   _onCalculateDistance(point.location.latitude, point.location.longitude,
+  //       _currentPosition.latitude, _currentPosition.longitude);
+  // }
 }
 
-// class Halte extends StatefulWidget {
-//   @override
-//   _HalteState createState() => _HalteState();
-// }
+class PointObject {
+  final Widget child;
+  final LatLng location;
 
-// class _HalteState extends State<Halte> {
-//   GoogleMapController _controller;
-//   Position position;
-//   Widget _child;
-
-//   Future<void> getPermission() async {
-//     PermissionStatus permission = await PermissionHandler()
-//         .checkPermissionStatus(PermissionGroup.location);
-//     if (permission == PermissionStatus.denied) {
-//       await PermissionHandler()
-//           .requestPermissions([PermissionGroup.locationAlways]);
-//     }
-//     var geolocator = Geolocator();
-//     GeolocationStatus geolocationStatus =
-//         await geolocator.checkGeolocationPermissionStatus();
-//     switch (geolocationStatus) {
-//       // case GeolocationStatus.denied:
-//       //   break;
-//       case GeolocationStatus.granted:
-//         _getCurrentLocation();
-//     }
-//   }
-
-//   void _getCurrentLocation() async {
-//     Position res = await Geolocator().getCurrentPosition();
-//     setState(() {
-//       position = res;
-//       _child = _mapWidget();
-//     });
-//   }
-
-//   Set<Marker> _createMarker() {
-//     return <Marker>[
-//       Marker(
-//           markerId: MarkerId('Me'),
-//           position: LatLng(position.latitude, position.longitude),
-//           icon: BitmapDescriptor.defaultMarker,
-//           infoWindow: InfoWindow(title: 'My Location'))
-//     ].toSet();
-//   }
-
-//   // void showToast(message){
-//   //   Fluttertoas
-//   // }
-//   void initState() {
-//     getPermission();
-
-//     super.initState();
-//   }
-
-//   void _onMapCreated(GoogleMapController controller) {
-//     setState(() {
-//       _controller = controller;
-//     });
-//   }
-
-//   Widget _mapWidget() {
-//     return GoogleMap(
-//       mapType: MapType.normal,
-//       markers: _createMarker(),
-//       initialCameraPosition:
-//           CameraPosition(target: LatLng(position.latitude, position.longitude)),
-//       onMapCreated: _onMapCreated,
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Halte Terdekat", style: TextStyle(color: Colors.white)),
-//         backgroundColor: Color(0xFFff0000),
-//       ),
-//       body: Stack(
-//         children: <Widget>[
-//           Container(
-//             child: GoogleMap(
-//               mapType: MapType.normal,
-//               initialCameraPosition: CameraPosition(
-//                 target: LatLng(-7.431326, 109.248592),
-//                 zoom: 12,
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+  PointObject({this.child, this.location});
+}
