@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:bus_trans_jateng/ui/models/rute_bus.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:bus_trans_jateng/ui/global/global_function.dart';
+// import 'package:bus_trans_jateng/ui/global/global_function.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bus_trans_jateng/ui/global/curve_painter.dart';
@@ -73,14 +73,7 @@ class _RuteDetailState extends State<RuteDetail> {
           addMarker(latLng, 'halte${ruteHalteBusList[i].key}',
               ruteHalteBusList[i].name, ruteHalteBusList[i]);
         });
-        LatLng sw = southwestFromLatLngList(points);
-        LatLng ne = northeastFromLatLngList(points);
-        LatLng mid =
-            MidPoint(sw.latitude, sw.longitude, ne.latitude, ne.longitude);
-        print('mid : ${mid.latitude} - ${mid.longitude}');
-        print('mid : ${mid.latitude} - ${mid.longitude}');
-        mapController.animateCamera(CameraUpdate.newCameraPosition(
-            CameraPosition(target: mid, zoom: 12.00)));
+
         setPolylines(
             ruteHalteBusList[i].latitude,
             ruteHalteBusList[i].longitude,
@@ -100,10 +93,6 @@ class _RuteDetailState extends State<RuteDetail> {
       position: mLatLng,
       infoWindow: InfoWindow(
         title: mDescription,
-        // onTap: (){
-        //   Navigator.push(
-        //       context, MaterialPageRoute(builder: (context) => RuteBusStopDetail(halteBus: HalteBus.fromRute(ruteHalteBus, getRute(widget.ruteBus.name)))));
-        // },
       ),
       // icon: mIcon,
     ));

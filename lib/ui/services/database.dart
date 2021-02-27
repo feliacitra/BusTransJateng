@@ -1,6 +1,6 @@
-import 'package:bus_trans_jateng/ui/models/rute_bus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bus_trans_jateng/ui/models/halte_bus.dart';
+import 'package:bus_trans_jateng/ui/models/rute_bus.dart';
 
 class DatabaseService {
   final String uid;

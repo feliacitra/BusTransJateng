@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_trans_jateng/ui/models/halte_bus.dart';
 import 'package:bus_trans_jateng/ui/global/global_function.dart';
+import 'package:bus_trans_jateng/ui/pages/components/monitoring.dart';
 
 //untuk tampilan list bus di menu bus terdekat
 class BusStopInfo extends StatelessWidget {
@@ -83,11 +84,12 @@ class BusStopInfo extends StatelessWidget {
           ),
           trailing: Icon(Icons.keyboard_arrow_right,
               color: Colors.black45, size: 60.0),
-          // onTap: () {
-
-          //   Navigator.push(
-          //       context, MaterialPageRoute(builder: (context) => BusDetail(bus: bus,halteLat: widget.halteBus.latitude,halteLong: widget.halteBus.longitude,)));
-          // },
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Monitoring(halteBus: halteBus)));
+          },
         ),
       ),
     );

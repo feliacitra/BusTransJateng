@@ -59,7 +59,7 @@ class _BusListState extends State<BusList> {
       _getCurrentLocation();
     }
     return Padding(
-      padding: const EdgeInsets.only(top: 20),
+      padding: const EdgeInsets.only(top: 2),
       child: Column(
         children: <Widget>[
           Center(

@@ -17,6 +17,10 @@ class _BusState extends State<Bus> {
       child: Scaffold(
         resizeToAvoidBottomPadding: false,
         body: BusList(),
+        appBar: AppBar(
+          title: Text('Bus Terdekat', style: TextStyle(color: Colors.white)),
+          backgroundColor: Color(0xFFff0000),
+        ),
       ),
     );
   }
