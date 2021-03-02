@@ -13,25 +13,12 @@ class BusStopInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     var _text = halteBus.rute.split(',');
     return Padding(
-      padding: EdgeInsets.only(top: 2),
+      padding: EdgeInsets.all(2.0),
       child: Card(
-        margin: EdgeInsets.fromLTRB(20, 6, 20, 0),
+        margin: EdgeInsets.fromLTRB(8, 6, 8, 0),
         child: ListTile(
           contentPadding:
               EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-          //icon bus
-          // leading: Container(
-          //   padding: EdgeInsets.only(right: 12.0),
-          //   decoration: new BoxDecoration(
-          //       border: new Border(
-          //           right:
-          //               new BorderSide(width: 2.0, color: Colors.blueAccent))),
-          //   child: Icon(
-          //     Icons.directions_bus,
-          //     color: Colors.redAccent,
-          //     size: 45,
-          //   ),
-          // ),
           title: Text(
             halteBus.name,
             style:
@@ -56,7 +43,7 @@ class BusStopInfo extends StatelessWidget {
                         itemCount: _text.length,
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 5, 10, 10),
+                            padding: const EdgeInsets.fromLTRB(0, 5, 5, 10),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                   vertical: 1, horizontal: 1),
@@ -75,11 +62,9 @@ class BusStopInfo extends StatelessWidget {
                         },
                       ),
                     )
-                    // Text( _text[0], style: TextStyle(color: Colors.black54)),
                   ],
                 ),
               ),
-              //Text( halteBus.rute, style: TextStyle(color: Colors.black54)),
             ],
           ),
           trailing: Icon(Icons.keyboard_arrow_right,

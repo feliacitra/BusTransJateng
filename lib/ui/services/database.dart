@@ -36,7 +36,7 @@ class DatabaseService {
     return snapshot.documents.map((doc) {
       return RuteBus(
         key: doc.documentID ?? '',
-        name: doc.data['nama'] ?? '',
+        name: doc.data['name'] ?? '',
       );
     }).toList();
   }

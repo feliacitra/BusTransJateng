@@ -4,7 +4,7 @@ import 'package:bus_trans_jateng/ui/models/rute_bus.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 // import 'package:bus_trans_jateng/ui/global/global_function.dart';
-import 'package:geolocator/geolocator.dart';
+// import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bus_trans_jateng/ui/global/curve_painter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,7 +20,7 @@ class _RuteDetailState extends State<RuteDetail> {
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController mapController;
   LatLng _lastMapPosition = _center;
-  Position _currentPosition;
+
   static const LatLng _center = const LatLng(-7.437726, 109.330851);
   final Set<Marker> _markers = {};
   List<LatLng> points = [];

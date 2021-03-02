@@ -64,7 +64,7 @@ class _BusListState extends State<BusList> {
         children: <Widget>[
           Center(
             child: Padding(
-              padding: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.all(6.0),
               child: Card(
                 child: TextField(
                   controller: editingController,

@@ -138,10 +138,11 @@ class _HalteState extends State<Halte> {
   @override
   void initState() {
     BitmapDescriptor.fromAssetImage(
-            ImageConfiguration(devicePixelRatio: 2), 'assets/meMark.png')
+            ImageConfiguration(devicePixelRatio: 2), 'assets/usermarker.png')
         .then((d) {
       iconMe = d;
     });
+
     // print(_getLastKnownLat());
     // print(_getLastKnownLong());
     super.initState();
