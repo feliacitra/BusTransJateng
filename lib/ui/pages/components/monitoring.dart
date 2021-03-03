@@ -1,13 +1,17 @@
 import 'dart:async';
 
+import 'package:bus_trans_jateng/ui/global/curve_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_trans_jateng/ui/models/halte_bus.dart';
+import 'package:bus_trans_jateng/ui/models/aboutbus.dart';
 // import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:bus_trans_jateng/ui/global/global_function.dart';
 import 'package:bus_trans_jateng/ui/pages/components/monitoring_detail.dart';
+// import 'package:numpakbis/shared/curve_painter.dart';
+// import 'package:provider/provider.dart';
 
 class Monitoring extends StatefulWidget {
   final HalteBus halteBus;
@@ -19,7 +23,7 @@ class Monitoring extends StatefulWidget {
 class _MonitoringState extends State<Monitoring> {
   List<HalteBus> halteBus = new List<HalteBus>();
   // final Set<Marker> _markers = {};
-  Completer<GoogleMapController> _controller = Completer();
+  // Completer<GoogleMapController> _controller = Completer();
   List<LatLng> points = [];
 
   Future getDocs() async {
@@ -64,34 +68,57 @@ class _MonitoringState extends State<Monitoring> {
     ));
   }
 
-  final databaseDeviceC = FirebaseDatabase.instance.reference().root();
-  final databaseDeviceA =
-      FirebaseDatabase.instance.reference().child('deviceA');
-  final databaseDeviceB =
-      FirebaseDatabase.instance.reference().child('deviceB');
+  // final databaseDeviceC = FirebaseDatabase.instance.reference().root();
+  // final databaseDeviceA =
+  //     FirebaseDatabase.instance.reference().child('deviceA');
+  // final databaseDeviceB =
+  //     FirebaseDatabase.instance.reference().child('deviceB');
 
   GoogleMapController mapController;
   // List<Marker> allMarkers = [];
   Iterable marker = [];
   Set<Marker> getMarkerFromDb = Set();
+  List<ListBus> listBus = new List<ListBus>();
   BitmapDescriptor iconMe;
-  BitmapDescriptor iconCar;
+  // BitmapDescriptor iconCar;
 
-  void readData() {
-    databaseDeviceA.onValue.listen((Event event) {
+  void readData(var deviceName) {
+    FirebaseDatabase.instance
+        .reference()
+        .child(deviceName)
+        .onValue
+        .listen((Event event) {
       print('Data : ${event.snapshot.value['latitude']}');
       print('Data : ${event.snapshot.value['longitude']}');
-      Marker resultMarker = Marker(
-          markerId: MarkerId(event.snapshot.value['markerId']),
-          position: LatLng(double.parse(event.snapshot.value['latitude']),
-              double.parse(event.snapshot.value['longitude'])),
-          icon: iconCar,
-          // rotation: event.snapshot.value.getBearing(),
-          infoWindow: InfoWindow(title: event.snapshot.value['markerId']));
-      setState(() {
-        getMarkerFromDb.remove(resultMarker);
-        getMarkerFromDb.add(resultMarker);
-      });
+
+      var tempDistance = CalculationByDistance(
+          double.parse(event.snapshot.value['latitude']),
+          double.parse(event.snapshot.value['longitude']),
+          double.parse(widget.halteBus.latitude),
+          double.parse(widget.halteBus.longitude));
+      print('Distance ${deviceName} : ${tempDistance}');
+      if (double.parse(tempDistance) <= 3.0) {
+        ListBus _bus = new ListBus(
+          markerId: event.snapshot.value['markerId'],
+          latitude: event.snapshot.value['latitude'],
+          longitude: event.snapshot.value['longitude'],
+          distance: tempDistance,
+          // tempDistance: event.snapshot.value['tempDistance'],
+        );
+        listBus.add(_bus);
+        Marker resultMarker = Marker(
+            markerId: MarkerId(event.snapshot.value['markerId']),
+            position: LatLng(double.parse(event.snapshot.value['latitude']),
+                double.parse(event.snapshot.value['longitude'])),
+            // icon: iconCar,
+            // rotation: ,
+
+            infoWindow: InfoWindow(title: event.snapshot.value['markerId']));
+        setState(() {
+          getMarkerFromDb.remove(resultMarker);
+          getMarkerFromDb.add(resultMarker);
+        });
+      }
     });
   }
 
@@ -101,22 +128,39 @@ class _MonitoringState extends State<Monitoring> {
     });
   }
 
-  void readDataB() {
-    databaseDeviceB.onValue.listen((Event event) {
-      print('Data : ${event.snapshot.value['latitude']}');
-      print('Data : ${event.snapshot.value['longitude']}');
-      Marker resultMarker = Marker(
-          markerId: MarkerId(event.snapshot.value['markerId']),
-          position: LatLng(double.parse(event.snapshot.value['latitude']),
-              double.parse(event.snapshot.value['longitude'])),
-          icon: iconCar,
-          infoWindow: InfoWindow(title: event.snapshot.value['markerId']));
-      setState(() {
-        getMarkerFromDb.remove(resultMarker);
-        getMarkerFromDb.add(resultMarker);
-      });
-    });
-  }
+// void readDataB() {
+//     databaseDeviceB.onValue.listen((Event event) {
+//       print('Data : ${event.snapshot.value['latitude']}');
+//       print('Data : ${event.snapshot.value['longitude']}');
+
+//       var _distance = CalculationByDistance(
+//           event.snapshot.value['latitude'],
+//           event.snapshot.value['longitude'],
+//           double.parse(widget.halteBus.latitude),
+//           double.parse(widget.halteBus.longitude));
+//       if ( double.parse(_distance)<= 3.0 ) {
+//          ListBus _bus = new ListBus(
+//           markerId: event.snapshot.value['markerId'],
+//           latitude: event.snapshot.value['latitude'],
+//           longitude: event.snapshot.value['longitude'],
+//         );
+//         listBus.add(_bus);
+//           Marker resultMarker = Marker(
+//           markerId: MarkerId(event.snapshot.value['markerId']),
+//           position: LatLng(double.parse(event.snapshot.value['latitude']),
+//               double.parse(event.snapshot.value['longitude'])),
+//           // icon: iconCar,
+//           // rotation: ,
+
+//           infoWindow: InfoWindow(title: event.snapshot.value['markerId']));
+//            setState(() {
+//         getMarkerFromDb.remove(resultMarker);
+//         getMarkerFromDb.add(resultMarker);
+//       });
+//       }
+
+//     });
+//   }
 
   void initState() {
     BitmapDescriptor.fromAssetImage(
@@ -124,13 +168,14 @@ class _MonitoringState extends State<Monitoring> {
         .then((d) {
       iconMe = d;
     });
-    BitmapDescriptor.fromAssetImage(
-            ImageConfiguration(devicePixelRatio: 2), 'assets/car.png')
-        .then((c) {
-      iconCar = c;
-    });
-    readData();
-    readDataB();
+    // BitmapDescriptor.fromAssetImage(
+    //         ImageConfiguration(devicePixelRatio: 2), 'assets/car.png')
+    //     .then((c) {
+    //   iconCar = c;
+    // });
+    readData("deviceA");
+    readData("deviceB");
+    // readDataB();
     getDocs();
 
     super.initState();
@@ -139,6 +184,46 @@ class _MonitoringState extends State<Monitoring> {
   @override
   Widget build(BuildContext context) {
     print('mymarker $getMarkerFromDb');
+//  final listBus = Provider.of<List<ListBus>>(context) ?? [];
+    // List<ListBus> listBus = new List<ListBus>() ?? [];
+    ListTile makeListTile(ListBus listBus) => ListTile(
+          contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
+          title: Text(
+            listBus.markerId,
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+          subtitle: Row(
+            children: <Widget>[
+              Text('Jarak : ' + listBus.distance + ' KM',
+                  style: TextStyle(color: Colors.black))
+            ],
+          ),
+          trailing: Icon(Icons.keyboard_arrow_right,
+              color: Colors.black26, size: 30.0),
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MonitoringDetail(
+                          bus: listBus,
+                          haltelat: widget.halteBus.latitude,
+                          haltelong: widget.halteBus.longitude,
+                        )));
+          },
+        );
+
+    Card makeCard(ListBus listBus) => Card(
+          elevation: 0.0,
+          margin: new EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+            ),
+            child: makeListTile(listBus),
+          ),
+        );
     return Scaffold(
       appBar: AppBar(
         title: Text('Bus Terdekat', style: TextStyle(color: Colors.white)),
@@ -198,7 +283,7 @@ class _MonitoringState extends State<Monitoring> {
                                         '3 KM RADIUS REAL-TIME DEPARTURE',
                                         textAlign: TextAlign.right,
                                         style: TextStyle(
-                                          color: Colors.red,
+                                          color: Colors.blue,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 15,
                                         ),
@@ -224,70 +309,57 @@ class _MonitoringState extends State<Monitoring> {
                                             color: Colors.black54,
                                             fontWeight: FontWeight.bold),
                                       ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      SizedBox(
+                                        height: 2,
+                                        child: Container(
+                                            decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topRight: Radius.circular(15),
+                                              topLeft: Radius.circular(15)),
+                                          color: Colors.black54,
+                                        )),
+                                      ),
                                     ],
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 5.0),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.only(
                                           topRight: Radius.circular(15),
                                           topLeft: Radius.circular(15)),
                                       color: Colors.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black,
-                                          offset: new Offset(0.0, 10.0),
-                                          blurRadius: 15.0,
-                                        )
-                                      ],
                                     ),
                                     child: ListView.builder(
                                       physics: NeverScrollableScrollPhysics(),
                                       shrinkWrap: true,
-                                      itemCount: 10,
+                                      itemCount: listBus.length,
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return Row(
                                           children: <Widget>[
-                                            Expanded(
-                                              child: ListView.builder(
-                                                scrollDirection: Axis.vertical,
-                                                shrinkWrap: true,
-                                                itemCount: 20,
-                                                itemBuilder: (context, index) {
-                                                  var tempDistance = CalculationByDistance(
-                                                      double.parse(widget.halteBus.latitude) == null
-                                                          ? 0
-                                                          : double.parse(widget
-                                                              .halteBus
-                                                              .latitude),
-                                                      double.parse(widget
-                                                                  .halteBus
-                                                                  .longitude) ==
-                                                              null
-                                                          ? 0
-                                                          : double.parse(widget
-                                                              .halteBus
-                                                              .longitude),
-                                                      double.parse(widget
-                                                          .halteBus.latitude),
-                                                      double.parse(
-                                                          widget.halteBus.longitude));
-                                                  return double.parse(
-                                                                  tempDistance) <=
-                                                              3.0 ||
-                                                          double.parse(
-                                                                  tempDistance) ==
-                                                              0.0
-                                                      ? MonitoringDetail()
-                                                      // bus: buses[index],
-                                                      // distance: tempDistance)
-                                                      : Container();
-                                                },
+                                            Container(
+                                              padding:
+                                                  EdgeInsets.only(right: 10.0),
+                                              decoration: new BoxDecoration(
+                                                  border: new Border(
+                                                      right: new BorderSide(
+                                                          width: 2.0,
+                                                          color: Colors.red))),
+                                              child: Icon(
+                                                Icons.directions_bus,
+                                                color: Colors.red,
+                                                size: 45,
                                               ),
                                             ),
+                                            Expanded(
+                                                child: Container(
+                                                    child: makeCard(
+                                                        listBus[index]))),
                                           ],
                                         );
                                       },
