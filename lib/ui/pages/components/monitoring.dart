@@ -1,17 +1,14 @@
 import 'dart:async';
 
-import 'package:bus_trans_jateng/ui/global/curve_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_trans_jateng/ui/models/halte_bus.dart';
 import 'package:bus_trans_jateng/ui/models/aboutbus.dart';
-// import 'package:geolocator/geolocator.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:bus_trans_jateng/ui/global/global_function.dart';
 import 'package:bus_trans_jateng/ui/pages/components/monitoring_detail.dart';
-// import 'package:numpakbis/shared/curve_painter.dart';
-// import 'package:provider/provider.dart';
 
 class Monitoring extends StatefulWidget {
   final HalteBus halteBus;

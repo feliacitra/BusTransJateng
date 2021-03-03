@@ -5,15 +5,12 @@ class ListBus {
   final String latitude;
   final String longitude;
   final String markerId;
-  ListBus({this.key, this.latitude, this.longitude, this.markerId});
+  final String distance;
+  ListBus(
+      {this.key, this.latitude, this.longitude, this.markerId, this.distance});
 
   @override
   String toString() {
-    return 'Bus{key: $key, latitude: $latitude, longitude: $longitude, markerId: $markerId}';
+    return 'Bus{key: $key, latitude: $latitude, longitude: $longitude, markerId: $markerId,distance: $distance}';
   }
 }
-
-final List<ListBus> _buses = [];
-String _latitude = '';
-String _longitude = '';
-List<ListBus> get buses => _buses;
