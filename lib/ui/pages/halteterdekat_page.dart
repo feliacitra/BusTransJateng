@@ -8,7 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:bus_trans_jateng/ui/global/custom_info_widget.dart';
 import 'package:bus_trans_jateng/ui/models/distance.dart';
-// import 'package:bus_trans_jateng/ui/global/global_function.dart';
+import 'package:bus_trans_jateng/ui/global/global_function.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:bus_trans_jateng/ui/models/halte_bus.dart';
 
@@ -166,77 +166,77 @@ class _HalteState extends State<Halte> {
       builder: (context, snapshot) {
         for (int i = 0; i < snapshot.data.documents.length; i++) {
           DocumentSnapshot snap = snapshot.data.documents[i];
-          // var _text = snap.data['rute'].split(',');
+          var _text = snap.data['rute'].split(',');
           _points.add(PointObject(
             location: LatLng(double.parse(snap.data['latitude']),
                 double.parse(snap.data['longitude'])),
-            // child: Card(
-            //   child: ListTile(
-            //     contentPadding:
-            //         EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-            //     title: Text(
-            //       snap.data['name'],
-            //       style: TextStyle(fontSize: 16),
-            //     ),
-            //     // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
+            child: Card(
+              child: ListTile(
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                title: Text(
+                  snap.data['name'],
+                  style: TextStyle(fontSize: 16),
+                ),
+                // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
 
-            //     subtitle: Column(
-            //       crossAxisAlignment: CrossAxisAlignment.start,
-            //       children: <Widget>[
-            //         Text(getType(snap.data['type']),
-            //             style: TextStyle(fontSize: 14)),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(getType(snap.data['type']),
+                        style: TextStyle(fontSize: 14)),
 
-            //         Container(
-            //           height: 28,
-            //           child: Row(
-            //             mainAxisAlignment: MainAxisAlignment.start,
-            //             children: <Widget>[
-            //               Expanded(
-            //                 child: new ListView.builder(
-            //                   scrollDirection: Axis.horizontal,
-            //                   shrinkWrap: true,
-            //                   itemCount: _text.length,
-            //                   itemBuilder: (context, index) {
-            //                     return Padding(
-            //                       padding:
-            //                           const EdgeInsets.fromLTRB(0, 3, 4, 5),
-            //                       child: Container(
-            //                         padding: const EdgeInsets.symmetric(
-            //                             vertical: 1, horizontal: 1),
-            //                         decoration: new BoxDecoration(
-            //                             border: new Border.all(
-            //                                 color:
-            //                                     getColor(_text[index].trim())),
-            //                             borderRadius:
-            //                                 BorderRadius.circular(5.0)),
-            //                         child: new Text(
-            //                           _text[index].trim(),
-            //                           style: TextStyle(
-            //                               color: getColor(_text[index].trim()),
-            //                               fontSize: 14),
-            //                           textAlign: TextAlign.center,
-            //                         ),
-            //                       ),
-            //                     );
-            //                   },
-            //                 ),
-            //               )
-            //               // Text( _text[0], style: TextStyle(color: Colors.black54)),
-            //             ],
-            //           ),
-            //         ),
-            //         //Text( halteBus.rute, style: TextStyle(color: Colors.black54)),
-            //       ],
-            //     ),
-            //   ),
-            // ),
+                    Container(
+                      height: 28,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Expanded(
+                            child: new ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              itemCount: _text.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 3, 4, 5),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 1, horizontal: 1),
+                                    decoration: new BoxDecoration(
+                                        border: new Border.all(
+                                            color:
+                                                getColor(_text[index].trim())),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0)),
+                                    child: new Text(
+                                      _text[index].trim(),
+                                      style: TextStyle(
+                                          color: getColor(_text[index].trim()),
+                                          fontSize: 14),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          )
+                          // Text( _text[0], style: TextStyle(color: Colors.black54)),
+                        ],
+                      ),
+                    ),
+                    //Text( halteBus.rute, style: TextStyle(color: Colors.black54)),
+                  ],
+                ),
+              ),
+            ),
           ));
           _markers.add(Marker(
             markerId: MarkerId(snap.documentID),
             icon: iconHalte,
             position: LatLng(double.parse(snap.data['latitude']),
                 double.parse(snap.data['longitude'])),
-            // onTap: () => _onTap(_points[i]),
+            onTap: () => _onTap(_points[i]),
           ));
         }
         return GestureDetector(
@@ -287,58 +287,58 @@ class _HalteState extends State<Halte> {
     );
   }
 
-  // _onTap(PointObject point) async {
-  //   final RenderBox renderBox = context.findRenderObject();
-  //   Rect _itemRect = renderBox.localToGlobal(Offset.zero) & renderBox.size;
+  _onTap(PointObject point) async {
+    final RenderBox renderBox = context.findRenderObject();
+    Rect _itemRect = renderBox.localToGlobal(Offset.zero) & renderBox.size;
 
-  //   if (_currentPosition == null) {
-  //     final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-  //     geolocator
-  //         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-  //         .then((Position position) {
-  //       if (position != null) {
-  //         setState(() {
-  //           _currentPosition = position;
-  //         });
-  //       }
-  //     }).catchError((e) {
-  //       print(e);
-  //     });
-  //   }
+    if (_currentPosition == null) {
+      final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+      geolocator
+          .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+          .then((Position position) {
+        if (position != null) {
+          setState(() {
+            _currentPosition = position;
+          });
+        }
+      }).catchError((e) {
+        print(e);
+      });
+    }
 
-  //   _infoWidgetRoute = InfoWidgetRoute(
-  //     child: point.child,
-  //     buildContext: context,
-  //     mapsWidgetSize: _itemRect,
-  //   );
+    _infoWidgetRoute = InfoWidgetRoute(
+      child: point.child,
+      buildContext: context,
+      mapsWidgetSize: _itemRect,
+    );
 
-  //   await _controller.animateCamera(
-  //     CameraUpdate.newCameraPosition(
-  //       CameraPosition(
-  //         target: LatLng(
-  //           point.location.latitude - 0.0001,
-  //           point.location.longitude,
-  //         ),
-  //         zoom: 16,
-  //       ),
-  //     ),
-  //   );
+    await _controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(
+            point.location.latitude - 0.0001,
+            point.location.longitude,
+          ),
+          zoom: 16,
+        ),
+      ),
+    );
 
-  //   await _controller.animateCamera(
-  //     CameraUpdate.newCameraPosition(
-  //       CameraPosition(
-  //         target: LatLng(
-  //           point.location.latitude,
-  //           point.location.longitude,
-  //         ),
-  //         zoom: 16,
-  //       ),
-  //     ),
-  //   );
+    await _controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(
+            point.location.latitude,
+            point.location.longitude,
+          ),
+          zoom: 16,
+        ),
+      ),
+    );
 
-  //   _onCalculateDistance(point.location.latitude, point.location.longitude,
-  //       _currentPosition.latitude, _currentPosition.longitude);
-  // }
+    // _onCalculateDistance(point.location.latitude, point.location.longitude,
+    //     _currentPosition.latitude, _currentPosition.longitude);
+  }
 }
 
 class PointObject {
