@@ -75,7 +75,7 @@ class _MonitoringState extends State<Monitoring> {
   // List<Marker> allMarkers = [];
   Iterable marker = [];
   Set<Marker> getMarkerFromDb = Set();
-  List<ListBus> listBus = new List<ListBus>();
+  List<ListBus> listBus = List<ListBus>();
   BitmapDescriptor iconMe;
   // BitmapDescriptor iconCar;
 
@@ -100,9 +100,23 @@ class _MonitoringState extends State<Monitoring> {
           latitude: event.snapshot.value['latitude'],
           longitude: event.snapshot.value['longitude'],
           distance: tempDistance,
-          // tempDistance: event.snapshot.value['tempDistance'],
         );
-        listBus.add(_bus);
+
+        if (listBus == null || listBus.isEmpty) {
+          listBus.add(_bus);
+        } else {
+          bool isSameBus = false;
+          for (var i = 0; i < listBus.length; i++) {
+            if (listBus[i].markerId == _bus.markerId) {
+              listBus[i] = _bus;
+              isSameBus = true;
+            }
+          }
+          if (isSameBus == false) {
+            listBus.add(_bus);
+          }
+        }
+
         Marker resultMarker = Marker(
             markerId: MarkerId(event.snapshot.value['markerId']),
             position: LatLng(double.parse(event.snapshot.value['latitude']),
@@ -183,7 +197,7 @@ class _MonitoringState extends State<Monitoring> {
     print('mymarker $getMarkerFromDb');
 //  final listBus = Provider.of<List<ListBus>>(context) ?? [];
     // List<ListBus> listBus = new List<ListBus>() ?? [];
-    ListTile makeListTile(ListBus listBus) => ListTile(
+    ListTile makeListTile(ListBus listBus, HalteBus halteBus) => ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
           title: Text(
             listBus.markerId,
@@ -205,8 +219,7 @@ class _MonitoringState extends State<Monitoring> {
                 MaterialPageRoute(
                     builder: (context) => MonitoringDetail(
                           bus: listBus,
-                          haltelat: widget.halteBus.latitude,
-                          haltelong: widget.halteBus.longitude,
+                          halteBus: halteBus,
                         )));
           },
         );
@@ -218,7 +231,7 @@ class _MonitoringState extends State<Monitoring> {
             decoration: BoxDecoration(
               color: Colors.white,
             ),
-            child: makeListTile(listBus),
+            child: makeListTile(listBus, widget.halteBus),
           ),
         );
     return Scaffold(
@@ -316,7 +329,7 @@ class _MonitoringState extends State<Monitoring> {
                                           borderRadius: BorderRadius.only(
                                               topRight: Radius.circular(15),
                                               topLeft: Radius.circular(15)),
-                                          color: Colors.black54,
+                                          color: Colors.black45,
                                         )),
                                       ),
                                     ],
