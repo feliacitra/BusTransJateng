@@ -35,7 +35,6 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
   LatLng _lastMapPosition = _center;
   static const LatLng _center = const LatLng(-7.797068, 110.370529);
   Position _currentPosition;
-  Circle _circle;
   BitmapDescriptor iconMe;
   BitmapDescriptor iconHalte;
   final Set<Marker> _markers = {};
@@ -47,6 +46,7 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
   PolylinePoints polylinePoints;
 
   List<HalteBus> halteBus = new List<HalteBus>();
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     _controller.complete(controller);
@@ -89,6 +89,30 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
     ));
   }
 
+  void _onCameraMove(CameraPosition position) {
+    _lastMapPosition = position.target;
+  }
+
+  Future<void> _onCalculateDistance(String lat1, String long1) async {
+    try {
+      Response response = await dio.get(
+          "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=$lat1,$long1&destinations=${widget.halteBus.latitude},${widget.halteBus.longitude}&key=$_API");
+      _distanceMatrix = new DistanceMatrix.fromJson(response.data);
+      print(_distanceMatrix.elements[0].distance.text +
+          ' - ' +
+          _distanceMatrix.elements[0].distance.value.toString());
+      print(_distanceMatrix.elements[0].duration.text +
+          ' - ' +
+          _distanceMatrix.elements[0].duration.value.toString());
+      setState(() {
+        _infoTracking =
+            '${_distanceMatrix.elements[0].duration.text} (${(_distanceMatrix.elements[0].distance.value / 1000).toStringAsFixed(1)} KM)';
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   void setPolylines() async {
     List<PointLatLng> result = await polylinePoints.getRouteBetweenCoordinates(
         _API,
@@ -109,10 +133,6 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
             points: polylineCoordinates));
       });
     }
-  }
-
-  void _onCameraMove(CameraPosition position) {
-    _lastMapPosition = position.target;
   }
 
   void updatePinOnMap() async {
@@ -143,31 +163,9 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
     });
   }
 
-  _getCurrentLocation() {
-    final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-    geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-        .then((Position position) {
-      setState(() {
-        _currentPosition = position;
-        mapController.animateCamera(CameraUpdate.newCameraPosition(
-            CameraPosition(
-                target: LatLng(position.latitude, position.longitude),
-                zoom: 16.00)));
-        createCurrentMarker(position);
-        print(position);
-      });
-    }).catchError((e) {
-      print(e);
-    });
-  }
-
   /// This method sets selectedLocation to current location.
   void setCurrentLocation() async {
     if (mapController != null) {
-      setState(() {
-        createCurrentMarker(_currentPosition);
-      });
       await mapController.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
@@ -193,56 +191,12 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
     }
   }
 
-  void createCurrentMarker(Position pos) {
-    this.setState(() {
-      _markers.add(Marker(
-        markerId: MarkerId('Me'),
-        icon: iconMe,
-        infoWindow: InfoWindow(
-          title: 'Me',
-        ),
-        position: LatLng(pos.latitude, pos.longitude),
-      ));
-      _circle = Circle(
-        circleId: CircleId("Me"),
-        radius: pos.accuracy,
-        zIndex: 1,
-        strokeColor: Colors.blue,
-        strokeWidth: 0,
-        center: LatLng(pos.latitude, pos.longitude),
-        fillColor: Colors.blue.withAlpha(60),
-      );
-    });
-  }
-
-  Future<void> _onCalculateDistance(String lat1, String long1) async {
-    try {
-      Response response = await dio.get(
-          "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=$lat1,$long1&destinations=${widget.halteBus.latitude},${widget.halteBus.longitude}&key=$_API");
-      _distanceMatrix = new DistanceMatrix.fromJson(response.data);
-      print(_distanceMatrix.elements[0].distance.text +
-          ' - ' +
-          _distanceMatrix.elements[0].distance.value.toString());
-      print(_distanceMatrix.elements[0].duration.text +
-          ' - ' +
-          _distanceMatrix.elements[0].duration.value.toString());
-      setState(() {
-        _infoTracking =
-            '${_distanceMatrix.elements[0].duration.text} (${(_distanceMatrix.elements[0].distance.value / 1000).toStringAsFixed(1)} km)';
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     _onCalculateDistance(widget.bus.latitude, widget.bus.longitude);
-
     polylinePoints = PolylinePoints();
-
-    void readData() {
+    readData() {
       FirebaseDatabase.instance
           .reference()
           .child(widget.bus.markerId)
@@ -252,18 +206,20 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
         print('Data : ${event.snapshot.value['longitude']}');
 
         setState(() {
-          lat = double.parse(event.snapshot.value['latitude']);
-          long = double.parse(event.snapshot.value['longitude']);
+          lat = event.snapshot.value['latitude'];
+          long = event.snapshot.value['longitude'];
         });
         updatePinOnMap();
+
         _onCalculateDistance(lat, long);
-        var tempDistance = CalculationByDistance(
+
+        var distance = CalculationByDistance(
             double.parse(lat),
             double.parse(long),
             double.parse(widget.halteBus.latitude),
             double.parse(widget.halteBus.longitude));
-        print('Distance ${widget.bus.markerId} : ${tempDistance}');
-        if (double.parse(tempDistance) < 0.1) {
+        print('Distance ${widget.bus.markerId} : $distance}');
+        if (double.parse(distance) < 0.2) {
           _sampaiTujuan();
         }
       });
@@ -276,9 +232,11 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        content: Text('Bus telah sampai pada tujuan ${widget.bus.markerId}..'),
+        content: Text(
+            'Bus ${widget.bus.markerId} telah sampai di ${widget.halteBus.name}'),
         actions: <Widget>[
           FlatButton(
+            //kembali ke list bus radius 3km
             child: Text('OK'),
             onPressed: () {
               var count = 0;
@@ -298,7 +256,6 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
         GoogleMap(
           mapType: MapType.normal,
           markers: Set.of((_markers != null) ? _markers : []),
-          // circles: Set.of((_circle != null) ? [_circle] : []),
           polylines: Set.of((_polylines != null) ? _polylines : []),
           initialCameraPosition: CameraPosition(
               target: LatLng(double.parse(widget.halteBus.latitude),
@@ -334,16 +291,6 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
                   child: Column(children: <Widget>[
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        FloatingActionButton(
-                            child: Icon(Icons.location_searching),
-                            onPressed: () {
-                              _getCurrentLocation();
-                            }),
-                        SizedBox(
-                          width: 10,
-                        ),
-                      ],
                     ),
                     SizedBox(
                       height: 10,
