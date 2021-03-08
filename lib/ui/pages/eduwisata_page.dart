@@ -13,7 +13,7 @@ class _EduwisataState extends State<Eduwisata> {
     "Terminal Purbalingga",
     "Taman Lalu Lintas Terminal Bulupitu",
     "Taman Andhang Pangrenan",
-    "Rita Supemall",
+    "Rita Supermall",
     "Alun-Alun Purwokerto",
     "Masjid Agung Purwokerto",
     "Museum Bank BRI",
@@ -147,6 +147,21 @@ showDialogFunc(context, img, title, desc) {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Container(
+                    alignment: Alignment.topRight,
+                    // color: Colors.white,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(
+                        Icons.highlight_off,
+                        color: Colors.black38,
+                        size: 40,
+                      ),
+                    ),
+                  ),
+
                   ClipRRect(
                     //tmpilin gambar popup
                     borderRadius: BorderRadius.circular(5),

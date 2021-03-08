@@ -68,7 +68,7 @@ class BusStopInfo extends StatelessWidget {
             ],
           ),
           trailing: Icon(Icons.keyboard_arrow_right,
-              color: Colors.black45, size: 60.0),
+              color: Colors.black45, size: 30.0),
           onTap: () {
             Navigator.push(
                 context,

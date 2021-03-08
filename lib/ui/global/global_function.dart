@@ -3,11 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-String getRute(String string) {
-  var temp = string.split(" ");
-  return temp[1];
-}
-
 String getType(String string) {
   String temp = '';
   switch (string) {
@@ -47,6 +42,7 @@ Color getColor(String s) {
   return temp;
 }
 
+//Creating a method using Haversine Formula
 String CalculationByDistance(
     double initialLat, double initialLong, double finalLat, double finalLong) {
   int R = 6371; // km (Earth radius)
@@ -62,11 +58,11 @@ String CalculationByDistance(
 }
 
 LatLng MidPoint(double lat1, double long1, double lat2, double long2) {
+  // Convert the latitudes
+  // and longitudes
+  // from degree to radians.
   double Bx = cos(lat2) * cos(long2 - long1);
   double By = cos(lat2) * sin(long2 - long1);
-  /* double a = ((cos(lat1)+Bx)*(cos(lat2)+Bx))+(By*By);
-  double b = sin(lat1)+sin(lat2);
-  double latMid = atan2(b , sqrt(a))*/
 
   double lonMid = long1 + atan2(By, cos(lat1) + Bx);
   double latMid = (lat1 + lat2) / 2;
@@ -78,78 +74,4 @@ LatLng MidPoint(double lat1, double long1, double lat2, double long2) {
 
 double toRadians(double deg) {
   return deg * (pi / 180);
-}
-
-LatLng southwestFromLatLngList(List<LatLng> list) {
-  assert(list.isNotEmpty);
-  double x0, x1, y0, y1;
-  for (LatLng latLng in list) {
-    if (x0 == null) {
-      x0 = x1 = latLng.latitude;
-      y0 = y1 = latLng.longitude;
-    } else {
-      if (latLng.latitude > x1) x1 = latLng.latitude;
-      if (latLng.latitude < x0) x0 = latLng.latitude;
-      if (latLng.longitude > y1) y1 = latLng.longitude;
-      if (latLng.longitude < y0) y0 = latLng.longitude;
-    }
-  }
-  return LatLng(x0, y0);
-}
-
-LatLng northeastFromLatLngList(List<LatLng> list) {
-  assert(list.isNotEmpty);
-  double x0, x1, y0, y1;
-  for (LatLng latLng in list) {
-    if (x0 == null) {
-      x0 = x1 = latLng.latitude;
-      y0 = y1 = latLng.longitude;
-    } else {
-      if (latLng.latitude > x1) x1 = latLng.latitude;
-      if (latLng.latitude < x0) x0 = latLng.latitude;
-      if (latLng.longitude > y1) y1 = latLng.longitude;
-      if (latLng.longitude < y0) y0 = latLng.longitude;
-    }
-  }
-
-  return LatLng(x1, y1);
-}
-
-double area(List<LatLng> arr) {
-  double area = 0;
-  int nPts = arr.length - 1;
-  int j = nPts - 1;
-  LatLng p1;
-  LatLng p2;
-  for (int i = 0; i < nPts; j = i++) {
-    p1 = arr[i];
-    p2 = arr[j];
-    area += p1.latitude * p2.longitude;
-    area -= p1.longitude * p2.latitude;
-  }
-  area /= 2;
-
-  return area;
-}
-
-LatLng Centroid(List<LatLng> pts) {
-  int nPts = pts.length - 1;
-  double x = 0;
-  double y = 0;
-  double f;
-  int j = nPts - 1;
-  LatLng p1;
-  LatLng p2;
-
-  for (int i = 0; i < nPts; j = i++) {
-    p1 = pts[i];
-    p2 = pts[j];
-    f = p1.latitude * p2.longitude - p2.latitude * p1.longitude;
-    x += (p1.latitude + p2.latitude) * f;
-    y += (p1.longitude + p2.longitude) * f;
-  }
-
-  f = area(pts) * 6;
-
-  return new LatLng(x / f, y / f);
 }

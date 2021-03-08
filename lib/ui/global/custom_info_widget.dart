@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:meta/meta.dart';
 
+//untuk popup info window halte
 class _InfoWidgetRouteLayout<T> extends SingleChildLayoutDelegate {
   final Rect mapsWidgetSize;
   final double width;
@@ -12,24 +13,12 @@ class _InfoWidgetRouteLayout<T> extends SingleChildLayoutDelegate {
       @required this.height,
       @required this.width});
 
-  /// Depending of the size of the marker or the widget, the offset in y direction has to be adjusted;
-  /// If the appear to be of different size, the commented code can be uncommented and
-  /// adjusted to get the right position of the Widget.
-  /// Or better: Adjust the marker size based on the device pixel ratio!!!!)
-
   @override
   Offset getPositionForChild(Size size, Size childSize) {
-//    if (Platform.isIOS) {
     return Offset(
       mapsWidgetSize.center.dx - childSize.width / 2,
       mapsWidgetSize.center.dy - childSize.height - 50,
     );
-//    } else {
-//      return Offset(
-//        mapsWidgetSize.center.dx - childSize.width / 2,
-//        mapsWidgetSize.center.dy - childSize.height - 10,
-//      );
-//    }
   }
 
   @override
@@ -145,6 +134,7 @@ class _InfoWidgetPopUpState extends State<InfoWidgetPopUp> {
 class _InfoWidgetClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
+//mengatur layar
     Path path = Path();
     path.lineTo(0.0, size.height - 20);
     path.quadraticBezierTo(0.0, size.height - 10, 10.0, size.height - 10);

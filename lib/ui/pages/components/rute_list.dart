@@ -11,13 +11,13 @@ class RuteList extends StatefulWidget {
 class _RuteListState extends State<RuteList> {
   @override
   Widget build(BuildContext context) {
-    final rute_buses = Provider.of<List<RuteBus>>(context) ?? [];
+    final rutebuses = Provider.of<List<RuteBus>>(context) ?? [];
     return ListView.builder(
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
-      itemCount: rute_buses.length,
+      itemCount: rutebuses.length,
       itemBuilder: (context, index) {
-        return RuteTile(ruteBus: rute_buses[index]);
+        return RuteTile(ruteBus: rutebuses[index]);
       },
     );
   }

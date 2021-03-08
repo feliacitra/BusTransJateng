@@ -77,7 +77,7 @@ class _MonitoringState extends State<Monitoring> {
   Set<Marker> getMarkerFromDb = Set();
   List<ListBus> listBus = List<ListBus>();
   BitmapDescriptor iconMe;
-  // BitmapDescriptor iconCar;
+  BitmapDescriptor iconCar;
 
   void readData(var deviceName) {
     FirebaseDatabase.instance
@@ -93,7 +93,7 @@ class _MonitoringState extends State<Monitoring> {
           double.parse(event.snapshot.value['longitude']),
           double.parse(widget.halteBus.latitude),
           double.parse(widget.halteBus.longitude));
-      print('Distance ${deviceName} : ${tempDistance}');
+      print('Distance $deviceName : $tempDistance');
       if (double.parse(tempDistance) <= 3.0) {
         ListBus _bus = new ListBus(
           markerId: event.snapshot.value['markerId'],
@@ -121,7 +121,7 @@ class _MonitoringState extends State<Monitoring> {
             markerId: MarkerId(event.snapshot.value['markerId']),
             position: LatLng(double.parse(event.snapshot.value['latitude']),
                 double.parse(event.snapshot.value['longitude'])),
-            // icon: iconCar,
+            icon: iconCar,
             // rotation: ,
 
             infoWindow: InfoWindow(title: event.snapshot.value['markerId']));
@@ -179,11 +179,11 @@ class _MonitoringState extends State<Monitoring> {
         .then((d) {
       iconMe = d;
     });
-    // BitmapDescriptor.fromAssetImage(
-    //         ImageConfiguration(devicePixelRatio: 2), 'assets/car.png')
-    //     .then((c) {
-    //   iconCar = c;
-    // });
+    BitmapDescriptor.fromAssetImage(
+            ImageConfiguration(devicePixelRatio: 2), 'assets/markerbus.png')
+        .then((c) {
+      iconCar = c;
+    });
     readData("deviceA");
     readData("deviceB");
     // readDataB();

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:bus_trans_jateng/ui/models/aboutbus.dart';
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart'; //untuk membuka http
 import 'package:bus_trans_jateng/ui/models/distance.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -36,7 +36,7 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
   static const LatLng _center = const LatLng(-7.797068, 110.370529);
   Position _currentPosition;
   BitmapDescriptor iconMe;
-  BitmapDescriptor iconHalte;
+  BitmapDescriptor iconCar;
   final Set<Marker> _markers = {};
   String _infoTracking;
 
@@ -65,9 +65,9 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
     setState(() {
       _markers.clear();
       addMarker(latLng_2, 'halte${widget.halteBus.key}', widget.halteBus.name,
-          iconHalte);
+          iconMe);
       addMarker(
-          latLng_1, "Bus", widget.bus.markerId, BitmapDescriptor.defaultMarker);
+          latLng_1, 'bus${widget.bus.markerId}', widget.bus.markerId, iconCar);
     });
 
     mapController.animateCamera(CameraUpdate.newCameraPosition(
@@ -94,6 +94,7 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
   }
 
   Future<void> _onCalculateDistance(String lat1, String long1) async {
+    //menggunakan distance matrix API
     try {
       Response response = await dio.get(
           "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=$lat1,$long1&destinations=${widget.halteBus.latitude},${widget.halteBus.longitude}&key=$_API");
@@ -114,6 +115,7 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
   }
 
   void setPolylines() async {
+    //menggunakan direction API
     List<PointLatLng> result = await polylinePoints.getRouteBetweenCoordinates(
         _API,
         double.parse(widget.bus.latitude),
@@ -155,11 +157,12 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
       var pinPosition = LatLng(double.parse(lat), double.parse(long));
       // the trick is to remove the marker (by id)
       // and add it again at the updated location
-      _markers.removeWhere((m) => m.markerId.value == 'Bus');
+      _markers
+          .removeWhere((m) => m.markerId.value == 'bus${widget.bus.markerId}');
       _markers.add(Marker(
-          markerId: MarkerId('Bus'),
+          markerId: MarkerId('bus${widget.bus.markerId}'),
           position: pinPosition, // updated position
-          icon: BitmapDescriptor.defaultMarker));
+          icon: iconCar));
     });
   }
 
@@ -195,6 +198,17 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
   void initState() {
     super.initState();
     _onCalculateDistance(widget.bus.latitude, widget.bus.longitude);
+
+    BitmapDescriptor.fromAssetImage(
+            ImageConfiguration(devicePixelRatio: 2), 'assets/usermarker.png')
+        .then((d) {
+      iconMe = d;
+    });
+    BitmapDescriptor.fromAssetImage(
+            ImageConfiguration(devicePixelRatio: 2), 'assets/markerbus.png')
+        .then((c) {
+      iconCar = c;
+    });
     polylinePoints = PolylinePoints();
     readData() {
       FirebaseDatabase.instance
@@ -219,7 +233,7 @@ class _MonitoringDetailState extends State<MonitoringDetail> {
             double.parse(widget.halteBus.latitude),
             double.parse(widget.halteBus.longitude));
         print('Distance ${widget.bus.markerId} : $distance}');
-        if (double.parse(distance) < 0.2) {
+        if (double.parse(distance) < 0.1) {
           _sampaiTujuan();
         }
       });

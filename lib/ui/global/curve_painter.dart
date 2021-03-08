@@ -10,7 +10,7 @@ class CurvePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     var paint = Paint();
-    // TODO: Set properties to paint
+
     paint.color = color;
     paint.style = PaintingStyle.fill; // Change this to fill
 
@@ -18,7 +18,7 @@ class CurvePainter extends CustomPainter {
     var center = Offset(size.width / 2, size.height / 2);
 
     var path = Path();
-    // TODO: Draw your path
+
     path.moveTo((size.width / 2) - 2, 0);
     path.lineTo((size.width / 2) + 2, 0);
     path.lineTo((size.width / 2) + 2, size.height);

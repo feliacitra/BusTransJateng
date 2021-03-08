@@ -32,7 +32,6 @@ class _BusListState extends State<BusList> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     editingController.addListener(() {
       setState(() {
@@ -48,13 +47,12 @@ class _BusListState extends State<BusList> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     editingController.dispose();
     super.dispose();
   }
 
   Widget build(BuildContext context) {
-    final halte_buses = Provider.of<List<HalteBus>>(context) ?? [];
+    final haltebuses = Provider.of<List<HalteBus>>(context) ?? [];
     if (_currentPosition == null) {
       _getCurrentLocation();
     }
@@ -85,7 +83,7 @@ class _BusListState extends State<BusList> {
                     ? ListView.builder(
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
-                        itemCount: halte_buses.length,
+                        itemCount: haltebuses.length,
                         itemBuilder: (context, index) {
                           var tempDistance = CalculationByDistance(
                               _currentPosition == null
@@ -94,12 +92,12 @@ class _BusListState extends State<BusList> {
                               _currentPosition == null
                                   ? 0
                                   : _currentPosition.longitude,
-                              double.parse(halte_buses[index].latitude),
-                              double.parse(halte_buses[index].longitude));
+                              double.parse(haltebuses[index].latitude),
+                              double.parse(haltebuses[index].longitude));
                           return double.parse(tempDistance) <= 3.0 ||
                                   double.parse(tempDistance) == 0.0
                               ? BusStopInfo(
-                                  halteBus: halte_buses[index],
+                                  halteBus: haltebuses[index],
                                   distance: tempDistance)
                               : Container();
                         },
@@ -107,7 +105,7 @@ class _BusListState extends State<BusList> {
                     : ListView.builder(
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
-                        itemCount: halte_buses.length,
+                        itemCount: haltebuses.length,
                         itemBuilder: (context, index) {
                           var tempDistance = CalculationByDistance(
                               _currentPosition == null
@@ -116,14 +114,14 @@ class _BusListState extends State<BusList> {
                               _currentPosition == null
                                   ? 0
                                   : _currentPosition.longitude,
-                              double.parse(halte_buses[index].latitude),
-                              double.parse(halte_buses[index].longitude));
-                          return halte_buses[index]
+                              double.parse(haltebuses[index].latitude),
+                              double.parse(haltebuses[index].longitude));
+                          return haltebuses[index]
                                   .name
                                   .toLowerCase()
                                   .contains(filter.toLowerCase())
                               ? BusStopInfo(
-                                  halteBus: halte_buses[index],
+                                  halteBus: haltebuses[index],
                                   distance: tempDistance)
                               : Container();
                         },

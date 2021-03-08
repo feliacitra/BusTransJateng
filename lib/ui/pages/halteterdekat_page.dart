@@ -7,7 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:dio/dio.dart';
 import 'package:bus_trans_jateng/ui/global/custom_info_widget.dart';
-import 'package:bus_trans_jateng/ui/models/distance.dart';
+// import 'package:bus_trans_jateng/ui/models/distance.dart';
 import 'package:bus_trans_jateng/ui/global/global_function.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:bus_trans_jateng/ui/models/halte_bus.dart';
@@ -23,17 +23,17 @@ class _HalteState extends State<Halte> {
   Position _currentPosition;
   final Set<Marker> _markers = {};
   BitmapDescriptor iconMe;
+  BitmapDescriptor iconHalte;
 
   InfoWidgetRoute _infoWidgetRoute;
   StreamSubscription _mapIdleSubscription;
   LatLng _initialLocation = LatLng(-7.437726, 109.330851);
-  Circle _circle;
-  BitmapDescriptor iconHalte;
-  var _API = 'AIzaSyB5DAWFw7QfviInDgsmiNSblskzqkUVSGk';
+
+  // var _API = 'AIzaSyB5DAWFw7QfviInDgsmiNSblskzqkUVSGk';
   Dio dio = new Dio();
-  DistanceMatrix _distanceMatrix;
+  // DistanceMatrix _distanceMatrix;
   List<PointObject> _points = [];
-  var _jarak;
+  // var _jarak;
 
   _getCurrentLocation() {
     final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
@@ -97,12 +97,6 @@ class _HalteState extends State<Halte> {
     });
   }
 
-  void _onMapCreated(GoogleMapController controller) {
-    setState(() {
-      _controller = controller;
-    });
-  }
-
   // _onCalculateDistance(lat1, long1, lat2, long2) async {
   //   try {
   //     Response response = await dio.get(
@@ -127,7 +121,6 @@ class _HalteState extends State<Halte> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     Future.delayed(Duration.zero, () {
       Scaffold.of(context).removeCurrentSnackBar();
     });
@@ -142,7 +135,11 @@ class _HalteState extends State<Halte> {
         .then((d) {
       iconMe = d;
     });
-
+    // BitmapDescriptor.fromAssetImage(
+    //         ImageConfiguration(devicePixelRatio: 2.5), 'assets/markerhalte.png')
+    //     .then((h) {
+    //   iconHalte = h;
+    // });
     // print(_getLastKnownLat());
     // print(_getLastKnownLong());
     super.initState();
@@ -178,8 +175,6 @@ class _HalteState extends State<Halte> {
                   snap.data['name'],
                   style: TextStyle(fontSize: 16),
                 ),
-                // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
-
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -250,7 +245,7 @@ class _HalteState extends State<Halte> {
               // circles: Set.of((_circle != null) ? [_circle] : []),
               initialCameraPosition: CameraPosition(
                 target: _initialLocation,
-                zoom: 11,
+                zoom: 11, //zoom awal
               ),
               onMapCreated: (GoogleMapController controller) {
                 _controller = controller;
@@ -319,7 +314,7 @@ class _HalteState extends State<Halte> {
             point.location.latitude - 0.0001,
             point.location.longitude,
           ),
-          zoom: 16,
+          zoom: 15,
         ),
       ),
     );
@@ -331,7 +326,7 @@ class _HalteState extends State<Halte> {
             point.location.latitude,
             point.location.longitude,
           ),
-          zoom: 16,
+          zoom: 15,
         ),
       ),
     );

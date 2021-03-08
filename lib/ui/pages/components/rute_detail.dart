@@ -23,6 +23,7 @@ class _RuteDetailState extends State<RuteDetail> {
 
   static const LatLng _center = const LatLng(-7.437726, 109.330851);
   final Set<Marker> _markers = {};
+  BitmapDescriptor iconHalte;
   List<LatLng> points = [];
 
   // polyline halte
@@ -33,8 +34,8 @@ class _RuteDetailState extends State<RuteDetail> {
 
 //dapatkan data dari firestore
   Future getDocs() async {
-    List<RuteHalteBus> listRuteHalteBus = new List<RuteHalteBus>();
-
+    // List<RuteHalteBus> listRuteHalteBus = new List<RuteHalteBus>();
+    List<RuteHalteBus> listRuteHalteBus = [];
     QuerySnapshot querySnapshot = await Firestore.instance
         .collection("halte_bus")
         .orderBy(widget.ruteBus.key.toString())
@@ -71,7 +72,7 @@ class _RuteDetailState extends State<RuteDetail> {
         points.add(latLng);
         setState(() {
           addMarker(latLng, 'halte${ruteHalteBusList[i].key}',
-              ruteHalteBusList[i].name, ruteHalteBusList[i]);
+              ruteHalteBusList[i].name, iconHalte, ruteHalteBusList[i]);
         });
 
         setPolylines(
@@ -86,7 +87,7 @@ class _RuteDetailState extends State<RuteDetail> {
 
 //fungsi penambahan marker
   void addMarker(LatLng mLatLng, String mTitle, String mDescription,
-      RuteHalteBus ruteHalteBus) {
+      BitmapDescriptor mIcon, RuteHalteBus ruteHalteBus) {
     _markers.add(Marker(
       // This marker id can be anything that uniquely identifies each marker.
       markerId: MarkerId(mTitle),
@@ -94,7 +95,7 @@ class _RuteDetailState extends State<RuteDetail> {
       infoWindow: InfoWindow(
         title: mDescription,
       ),
-      // icon: mIcon,
+      icon: mIcon,
     ));
   }
 
@@ -117,7 +118,7 @@ class _RuteDetailState extends State<RuteDetail> {
       });
       setState(() {
         _polylines.add(Polyline(
-            width: 5, // set the width of the polylines
+            width: 5,
             polylineId: PolylineId('poly_$id'),
             color: Colors.blue,
             points: polylineCoordinates));
@@ -127,6 +128,11 @@ class _RuteDetailState extends State<RuteDetail> {
 
   @override
   void initState() {
+    // BitmapDescriptor.fromAssetImage(
+    //         ImageConfiguration(devicePixelRatio: 2.5), 'assets/markerhalte.png')
+    //     .then((d) {
+    //   iconHalte = d;
+    // });
     getDocs();
 
     polylinePoints = PolylinePoints();
@@ -144,8 +150,6 @@ class _RuteDetailState extends State<RuteDetail> {
               color: Colors.black54,
             ),
           ),
-          // trailing: Icon(Icons.keyboard_arrow_right,
-          //     color: Colors.black26, size: 30.0),
         );
     Card makeCard(RuteHalteBus ruteHalteBus) => Card(
           elevation: 0.0,
