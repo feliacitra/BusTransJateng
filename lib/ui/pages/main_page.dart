@@ -9,6 +9,7 @@ import 'package:bus_trans_jateng/ui/pages/about_us.dart';
 import 'package:bus_trans_jateng/ui/pages/eduwisata_page.dart';
 import 'package:bus_trans_jateng/ui/pages/rute_page.dart';
 import 'package:bus_trans_jateng/ui/pages/radiotrans_page.dart';
+import 'package:bus_trans_jateng/ui/pages/visi.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -408,15 +409,17 @@ class _MainPageState extends State<MainPage> {
                 margin: EdgeInsets.only(top: 40),
                 child: Row(
                   //untuk menu baris 4
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => About()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => VisiMisi()));
                       },
                       child: Container(
-                        //container Developer
+                        //container Pogram visi
                         height: 110,
                         width: 110,
                         decoration: BoxDecoration(
@@ -434,10 +437,52 @@ class _MainPageState extends State<MainPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              height: 40,
-                              width: 40,
+                              height: 50,
+                              width: 55,
                               margin:
                                   EdgeInsets.only(bottom: 5), //jarak dg tulisan
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image: AssetImage('assets/target.PNG'))),
+                            ),
+                            Text(
+                              'Visi Misi',
+                              style: GoogleFonts.dmSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      //about us
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => About()));
+                      },
+                      child: Container(
+                        //container about us
+                        height: 110,
+                        width: 110,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: <BoxShadow>[
+                              BoxShadow(
+                                  color: "585464".toColor().withOpacity(0.07),
+                                  blurRadius: 16,
+                                  offset: Offset(0.0, 4.0))
+                            ]),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 40,
+                              width: 40,
+                              margin: EdgeInsets.only(bottom: 5),
                               decoration: BoxDecoration(
                                   image: DecorationImage(
                                       image:
@@ -449,14 +494,14 @@ class _MainPageState extends State<MainPage> {
                                 fontSize: 14,
                                 fontWeight: FontWeight.normal,
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ))
